@@ -13,17 +13,15 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import useCanvasStore from "@/stores/useCanvasStore";
 
-type Props = {
-  selectedNodeId: string | null;
-  setSelectedNodeId: (id: string | null) => void;
-};
-
-export default function SimpleDock({
-  selectedNodeId,
-  setSelectedNodeId,
-}: Props) {
+export default function SimpleDock() {
   const rf = useReactFlow();
+  const selectedNodeId = useCanvasStore((s: any) => s.selectedNodeId);
+  const setSelectedNodeId = useCanvasStore((s: any) => s.setSelectedNodeId);
+  const addNodeStore = useCanvasStore((s: any) => s.addNode);
+  const removeNodeStore = useCanvasStore((s: any) => s.removeNode);
+  const exportState = useCanvasStore((s: any) => s.exportState);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -33,45 +31,37 @@ export default function SimpleDock({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  const openCreateDialog = useCanvasStore((s: any) => s.openCreateDialog)
+
   const addNode = useCallback(() => {
-    const id = String(Date.now());
-    const newNode: Node = {
-      id,
-      type: "custom",
-      position: { x: 250, y: 150 },
-      data: {
-        label: `Node ${id}`,
-        onClick: (nodeId: string) => setSelectedNodeId(nodeId),
-      },
-    };
-    rf.setNodes((nds: Node[]) => nds.concat(newNode));
-  }, [rf, setSelectedNodeId]);
+    openCreateDialog()
+  }, [openCreateDialog])
 
   const deleteNode = useCallback(() => {
     const id = selectedNodeId;
     if (!id) return;
-    rf.setNodes((nds: Node[]) => nds.filter((n) => n.id !== id));
-    rf.setEdges((eds: Edge[]) =>
-      eds.filter((e) => e.source !== id && e.target !== id),
-    );
+    // use canvas store to remove node and related edges
+    removeNodeStore(id);
     setSelectedNodeId(null);
-  }, [rf, selectedNodeId, setSelectedNodeId]);
+  }, [selectedNodeId, removeNodeStore, setSelectedNodeId]);
 
   const exportJson = useCallback(() => {
     try {
-      const obj = rf.toObject()
-      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `graph-${Date.now()}.json`
-      a.click()
-      URL.revokeObjectURL(url)
+      const obj = rf.toObject();
+      const blob = new Blob([JSON.stringify(obj, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `graph-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error('Export failed', err)
+      console.error("Export failed", err);
     }
-  }, [rf])
+  }, [rf]);
 
   return (
     <TooltipProvider>
@@ -90,7 +80,7 @@ export default function SimpleDock({
                 onClick={addNode}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "size-12 rounded-full",
+                  "size-12 rounded-full bg-transparent cursor-pointer",
                 )}
               >
                 <Plus className="size-5 text-black cursor-pointer" />
@@ -110,7 +100,7 @@ export default function SimpleDock({
                 onClick={deleteNode}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "size-12 rounded-full",
+                  "size-12 rounded-full bg-transparent cursor-pointer",
                 )}
               >
                 <Trash2 className="size-5 text-black cursor-pointer" />
@@ -130,7 +120,7 @@ export default function SimpleDock({
                 onClick={exportJson}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "size-12 rounded-full",
+                  "size-12 rounded-full bg-transparent cursor-pointer",
                 )}
               >
                 <Download className="size-5 text-black cursor-pointer" />

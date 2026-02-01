@@ -2,6 +2,7 @@
 
 import React from 'react'
 import FlowCanvas from '../../components/FlowCanvas'
+export const dynamic = 'force-dynamic'
 
 export default function Page() {
   return (
