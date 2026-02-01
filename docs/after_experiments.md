@@ -37,5 +37,5 @@
 
 Examples: 
 - onNodeClick gives full node context.
--OnNodeDragStart is triggered with user drags/moves a node.
--onNodeMouseEnter is triggered when user hovers over a node.
+- OnNodeDragStart is triggered with user drags/moves a node.
+- onNodeMouseEnter is triggered when user hovers over a node.
