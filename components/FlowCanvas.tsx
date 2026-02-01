@@ -13,7 +13,8 @@ import ReactFlow, {
 } from 'reactflow'
 
 import CustomNode from './CustomNode'
-import FlowToolbar from './FlowToolbar'
+import DockWrapper from './dock/DockWrapper'
+import SimpleDock from './dock/SimpleDock'
 
 type MyNodeData = { label?: string; onClick?: (id: string) => void }
 
@@ -31,19 +32,34 @@ const nodeTypes = { custom: CustomNode }
 export default function FlowCanvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  const [selectedNodeId, setSelectedNodeId] = React.useState<string | null>(null)
 
   const onConnect = useCallback((params: any) => setEdges((eds: any) => addEdge(params, eds)), [setEdges])
 
   return (
     <ReactFlowProvider>
-      <div style={{ width: '100%', height: '80vh' }}>
-        <ReactFlow nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={onConnect} nodeTypes={nodeTypes} fitView>
-          <Background />
-          <Controls />
-          <Panel position="top-left">
-            <FlowToolbar />
-          </Panel>
-        </ReactFlow>
+      <div className="relative w-full h-full">
+        <div className="absolute inset-0" style={{ width: '100%', height: '100%' }}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes}
+            fitView
+            onNodeClick={(e, node) => {
+              setSelectedNodeId(node.id)
+            }}
+          >
+            <Background />
+            <Controls />
+          </ReactFlow>
+        </div>
+
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-40 pointer-events-auto">
+          <SimpleDock selectedNodeId={selectedNodeId} setSelectedNodeId={setSelectedNodeId} />
+        </div>
       </div>
     </ReactFlowProvider>
   )

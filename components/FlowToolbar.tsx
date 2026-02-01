@@ -34,13 +34,9 @@ export default function FlowToolbar() {
 
   return (
     <div className={styles.toolbar}>
-      <button onClick={addNode}>+ Node</button>
-      <button className="secondary" onClick={fit}>
-        Fit
-      </button>
-      <button className="secondary" onClick={exportJson}>
-        Export
-      </button>
+      <button onClick={addNode} className="px-3 py-1 rounded bg-sky-500 text-white">+ Node</button>
+      <button onClick={fit} className="px-3 py-1 rounded bg-slate-600 text-white">Fit</button>
+      <button onClick={exportJson} className="px-3 py-1 rounded bg-slate-600 text-white">Export</button>
     </div>
   )
 }

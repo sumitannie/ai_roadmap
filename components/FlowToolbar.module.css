@@ -2,14 +2,3 @@
   display: flex;
   gap: 8px;
 }
-.toolbar button {
-  background: #0ea5e9;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.toolbar button.secondary {
-  background: #64748b;
-}

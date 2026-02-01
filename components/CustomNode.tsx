@@ -2,7 +2,6 @@
 
 import React, { memo } from 'react'
 import { Handle, Position, NodeProps } from 'reactflow'
-import styles from './CustomNode.module.css'
 
 type MyNodeData = {
   label?: string
@@ -20,8 +19,8 @@ const CustomNode: React.FC<NodeProps<MyNodeData>> = ({ id, data }) => {
   }
 
   return (
-    <div className={styles.node} onClick={handleClick} role="button" tabIndex={0}>
-      <div className={styles.label}>{data?.label ?? 'Custom Node'}</div>
+    <div className="bg-white border border-slate-200 rounded-lg shadow px-3 py-2 cursor-pointer select-none" onClick={handleClick} role="button" tabIndex={0}>
+      <div className="font-semibold text-slate-800">{data?.label ?? 'Custom Node'}</div>
       <Handle type="target" id="a" position={Position.Left} />
       <Handle type="source" id="b" position={Position.Right} />
     </div>
