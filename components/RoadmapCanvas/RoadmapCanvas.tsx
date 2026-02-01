@@ -1,170 +1,115 @@
-"use client";
-import { useState, useCallback } from "react";
+'use client';
 
-import { 
+import { useState, useCallback } from 'react';
+import {
   ReactFlow,
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
+  Background,
+  Controls,
+  Node,
+  Edge,
   NodeChange,
   EdgeChange,
   Connection,
-  Node,
+  NodeTypes,
 } from '@xyflow/react';
+import { Plus, Wand2 } from 'lucide-react';
+import CustomNode from '@/components/nodes/CustomNode';
 
-import CustomNode from "../nodes/CustomNode";
+type CustomNodeData = {
+  label: string;
+  status?: 'Pending' | 'Completed' | 'Locked';
+  description?: string;
+};
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   custom: CustomNode,
 };
 
-
-export default function RoadmapCanvas(){
-  const [nodes, setNodes] = useState([
+export default function RoadmapCanvas() {
+  const [nodes, setNodes] = useState<Node<CustomNodeData>[]>([
     {
       id: 'n1',
       type: 'custom',
-      position: {x: 0, y: 0},
-      data: {label: 'HTML', status: 'Pending'},
+      position: { x: 0, y: 0 },
+      data: { label: 'Learn Basics', status: 'Pending', description: 'Master fundamentals' },
     },
     {
       id: 'n2',
       type: 'custom',
-      position: {x: 0, y: 100},
-      data: { label: 'JavaScript', status: 'Locked'},
-    }
+      position: { x: 300, y: 200 },
+      data: { label: 'Advanced Concepts', status: 'Locked', description: 'Deep dive' },
+    },
   ]);
 
-  const [edges, setEdges] = useState<EdgeChange[]>([] as any);
-
-  const createNode = (label: String) => {
-    const newNode = { //this represents one node
-      id: crypto.randomUUID(),
-      type: 'custom', //tells react flow to use CustomNode component to render this node
-     position: {
-      x: Math.random() * 400,
-      y: Math.random() * 400,
-     },
-
-     data: {
-      label,
-      status: 'pending'
-     },
-    };
-
-    setNodes((prevNodes) => [...prevNodes, newNode]);
-
-    //setNodes() updates react state. (prevNodes) => ... React gives us the current nodes array, we must return a new array
-  } ;
-
-
-  const connectNodes = (sourceId: string, targetId: string) => {
-    const newEdge = {
-       id: `{sourceId}-{targetId}`,
-       source: sourceId,
-       target: targetId,
-       animated: true,
-    };
-
-    setEdges((prevEdges) => [...prevEdges, newEdge]);
-  };
-
+  const [edges, setEdges] = useState<Edge[]>([]);
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) =>
-      setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)
-  ), [] );
+    (changes: NodeChange[]) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  );
 
   const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => 
-      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)
-  ), [] );
-
+    (changes: EdgeChange[]) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    []
+  );
 
   const onConnect = useCallback(
-    (params: Connection) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    [] );
+    (params: Connection) =>
+      setEdges((eds) =>
+        addEdge(
+          { ...params, animated: true, style: { strokeWidth: 2 } },
+          eds
+        )
+      ),
+    []
+  );
 
+  const createNode = () => {
+    setNodes((nds) => [
+      ...nds,
+      {
+        id: crypto.randomUUID(),
+        type: 'custom',
+        position: { x: Math.random() * 500, y: Math.random() * 400 },
+        data: { label: 'New Topic', status: 'Pending' },
+      },
+    ]);
+  };
 
-    // node event listeners
+  return (
+    <div className="relative h-screen w-screen">
+      <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 flex gap-2 rounded-lg bg-card border px-3 py-2 shadow-md">
+        <button
+          onClick={createNode}
+          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium"
+        >
+          <Plus className="w-4 h-4" />
+          Add Node
+        </button>
+        <button className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm font-medium">
+          <Wand2 className="w-4 h-4" />
+          Auto Layout
+        </button>
+      </div>
 
-    const onNodeClick = (_: any, node: Node) => {
-      console.log('Node Clicked:', node);
-      
-    };
-    
-    const onNodeDragStop = (_: any, node: Node) => {
-      console.log('Node drag stopped: ', node);
-      
-    };
-  
-    const onSelectionChange = (selection: { nodes: Node[] }) => {
-      console.log('Seleted node: ', selection.nodes);
-      
-    };
-
-  
-    return(
-      <div style={{width: '100vw', height: '100vh'}}>
-
-        <div>
-          <button 
-          onClick={() => createNode('New topic')}
-          style={{
-            padding: '8px 12px',
-            background: '#2563eb',
-            color: 'white',
-            borderRadius: 6,
-            border: 'none',
-            cursor: 'pointer',
-          }}
-          >
-           Create Node
-          </button>
-
-        </div>
-
-        <div>
-          <button onClick={() => {
-            createNode('New Node n1');
-            createNode('New Node n2');
-          }}
-          
-          style={{background: 'lightgrey', text: 'white', borderRadius: '10px'}}
-          >
-            Add Nodes
-          </button>
-          <br />
-          <button onClick={() => connectNodes(nodes[0].id, nodes[1].id)}
-          style={{background: 'lightgrey', text: 'white', borderRadius: '10px'}}
-          >
-            Connect First Two Nodes
-          </button>
-        </div>
-
-        <ReactFlow 
+      <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        nodesConnectable={true}
-
-        onNodeClick={onNodeClick}
-        onNodeDragStop={onNodeDragStop}
-        onSelectionChange={onSelectionChange}
-
         fitView
-        panOnDrag={true}
-        zoomOnScroll={true}
-        zoomOnPinch={true}
-        minZoom={0.7}
-        maxZoom={2}
-
-        style={{ backgroundColor: 'lightblue'}}
-        />
-
-      </div>
-    )
+        panOnDrag
+        zoomOnScroll
+        zoomOnPinch
+      >
+        <Background gap={24} size={1} />
+        <Controls />
+      </ReactFlow>
+    </div>
+  );
 }
