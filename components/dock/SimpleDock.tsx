@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { Plus, Trash2, Download } from "lucide-react";
-import { useReactFlow, Node, Edge } from "reactflow";
+import { useReactFlow } from "reactflow";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import useCanvasStore from "@/stores/useCanvasStore";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
 export default function SimpleDock() {
   const rf = useReactFlow();
@@ -31,16 +32,15 @@ export default function SimpleDock() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const openCreateDialog = useCanvasStore((s: any) => s.openCreateDialog)
+  const openCreateDialog = useCanvasStore((s: any) => s.openCreateDialog);
 
   const addNode = useCallback(() => {
-    openCreateDialog()
-  }, [openCreateDialog])
+    openCreateDialog();
+  }, [openCreateDialog]);
 
   const deleteNode = useCallback(() => {
     const id = selectedNodeId;
     if (!id) return;
-    // use canvas store to remove node and related edges
     removeNodeStore(id);
     setSelectedNodeId(null);
   }, [selectedNodeId, removeNodeStore, setSelectedNodeId]);
@@ -58,7 +58,6 @@ export default function SimpleDock() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error("Export failed", err);
     }
   }, [rf]);
@@ -83,7 +82,7 @@ export default function SimpleDock() {
                   "size-12 rounded-full bg-transparent cursor-pointer",
                 )}
               >
-                <Plus className="size-5 text-black cursor-pointer" />
+                <Plus className="size-5 text-foreground cursor-pointer" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -103,7 +102,7 @@ export default function SimpleDock() {
                   "size-12 rounded-full bg-transparent cursor-pointer",
                 )}
               >
-                <Trash2 className="size-5 text-black cursor-pointer" />
+                <Trash2 className="size-5 text-foreground cursor-pointer" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -123,13 +122,22 @@ export default function SimpleDock() {
                   "size-12 rounded-full bg-transparent cursor-pointer",
                 )}
               >
-                <Download className="size-5 text-black cursor-pointer" />
+                <Download className="size-5 text-foreground cursor-pointer" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
               <p>Export JSON</p>
             </TooltipContent>
           </Tooltip>
+        </DockIcon>
+
+        <DockIcon>
+          <AnimatedThemeToggler
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon" }),
+              "size-12 rounded-full bg-transparent cursor-pointer text-foreground",
+            )}
+          />
         </DockIcon>
       </Dock>
     </TooltipProvider>
