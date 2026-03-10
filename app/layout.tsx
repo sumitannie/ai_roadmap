@@ -1,7 +1,7 @@
-"use client";
-import { ReactFlowProvider } from "reactflow";
 import "./globals.css";
+// @ts-ignore
 import "reactflow/dist/style.css";
+import { Providers } from "@/components/providers";
 
 export default function RootLayout({
   children,
@@ -10,16 +10,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Inline script: apply saved theme before first paint to prevent flash */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
-          }}
-        />
-      </head>
       <body>
-        <ReactFlowProvider>{children}</ReactFlowProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

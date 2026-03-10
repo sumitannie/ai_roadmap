@@ -21,7 +21,7 @@ export default function Page() {
       {!isChatOpen && (
         <button
           onClick={() => setIsChatOpen(true)}
-          className="absolute top-3 right-3 z-50 flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow transition-colors"
+          className="absolute top-3 right-3 z-50 flex items-center gap-2 px-3 py-2 bg-primary hover:bg-primary/90 text-primary-foreground glow-primary-sm text-sm font-medium rounded-lg shadow transition-colors"
           aria-label="Open AI chat"
         >
           <MessageSquare className="w-4 h-4" />

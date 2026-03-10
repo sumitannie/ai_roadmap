@@ -18,20 +18,9 @@ export const AnimatedThemeToggler = ({
   const [isDark, setIsDark] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
+  // Sync React state from the DOM (class already set by the layout script before paint)
   useEffect(() => {
-    const updateTheme = () => {
-      setIsDark(document.documentElement.classList.contains("dark"))
-    }
-
-    updateTheme()
-
-    const observer = new MutationObserver(updateTheme)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    })
-
-    return () => observer.disconnect()
+    setIsDark(document.documentElement.classList.contains("dark"))
   }, [])
 
   const toggleTheme = useCallback(() => {
