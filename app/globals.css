@@ -151,6 +151,13 @@
   .glow-primary-sm {
     box-shadow: 0 0 6px 1px oklch(0.618 0.118 178 / 30%);
   }
+  /* Text-specific glow — use on text elements */
+  .text-glow-primary {
+    text-shadow: 0 0 8px oklch(0.618 0.118 178 / 70%);
+  }
+  .text-glow-primary-sm {
+    text-shadow: 0 0 4px oklch(0.618 0.118 178 / 50%);
+  }
 }
 
 ::view-transition-old(root), ::view-transition-new(root) {

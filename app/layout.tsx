@@ -1,3 +1,4 @@
+// @ts-ignore
 import "./globals.css";
 // @ts-ignore
 import "reactflow/dist/style.css";

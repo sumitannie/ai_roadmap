@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import type { Node, Edge } from 'reactflow'
+import type { MyNodeData } from '@/components/CustomNode'
 
 type CanvasState = {
   nodes: Node[]
@@ -10,6 +11,7 @@ type CanvasState = {
   // dialog UI state (transient)
   isCreateDialogOpen: boolean
   createDialogDraftLabel: string
+  createDialogDraftBody: string
   lastCreatedNodeId?: string
   setNodes: (nodes: Node[]) => void
   setEdges: (edges: Edge[]) => void
@@ -22,6 +24,7 @@ type CanvasState = {
   openCreateDialog: (initial?: string) => void
   closeCreateDialog: () => void
   setCreateDialogLabel: (label: string) => void
+  setCreateDialogBody: (body: string) => void
   createNodeFromDialog: (position?: { x: number; y: number }) => string | null
   clearLastCreatedNodeId: () => void
   exportState: () => { nodes: Node[]; edges: Edge[]; selectedNodeId: string | null }
@@ -36,6 +39,7 @@ export const useCanvasStore = create<CanvasState>()(
       selectedNodeId: null,
       isCreateDialogOpen: false,
       createDialogDraftLabel: '',
+      createDialogDraftBody: '',
       lastCreatedNodeId: undefined,
       setNodes: (nodes: Node[]) => set(() => ({ nodes })),
       setEdges: (edges: Edge[]) => set(() => ({ edges })),
@@ -48,21 +52,28 @@ export const useCanvasStore = create<CanvasState>()(
       addEdge: (edge: Edge) => set((state) => { state.edges.push(edge) }),
       removeEdgesForNode: (id: string) => set((state) => { state.edges = state.edges.filter((e: Edge) => e.source !== id && e.target !== id) }),
       setSelectedNodeId: (id: string | null) => set(() => ({ selectedNodeId: id })),
-      openCreateDialog: (initial = '') => set(() => ({ isCreateDialogOpen: true, createDialogDraftLabel: initial })),
-      closeCreateDialog: () => set(() => ({ isCreateDialogOpen: false, createDialogDraftLabel: '' })),
+      openCreateDialog: (initial = '') => set(() => ({ isCreateDialogOpen: true, createDialogDraftLabel: initial, createDialogDraftBody: '' })),
+      closeCreateDialog: () => set(() => ({ isCreateDialogOpen: false, createDialogDraftLabel: '', createDialogDraftBody: '' })),
       setCreateDialogLabel: (label: string) => set(() => ({ createDialogDraftLabel: label })),
+      setCreateDialogBody: (body: string) => set(() => ({ createDialogDraftBody: body })),
       createNodeFromDialog: (position) => {
         const draft = get().createDialogDraftLabel?.trim()
         if (!draft) return null
         const id = String(Date.now())
         const pos = position ?? { x: 250, y: 150 }
-        const node: Node = { id, type: 'custom', position: pos, data: { label: draft, onClick: (nid: string) => get().setSelectedNodeId(nid) } }
+        const bodyDraft = get().createDialogDraftBody?.trim()
+        const nodeData: MyNodeData = {
+          label: draft,
+          body: bodyDraft || undefined,
+          onClick: (nid: string) => get().setSelectedNodeId(nid),
+        }
+        const node: Node<MyNodeData> = { id, type: 'custom', position: pos, data: nodeData }
         set((state) => {
           state.nodes.push(node)
-          // state.selectedNodeId = id
           state.lastCreatedNodeId = id
           state.isCreateDialogOpen = false
           state.createDialogDraftLabel = ''
+          state.createDialogDraftBody = ''
         })
         return id
       },

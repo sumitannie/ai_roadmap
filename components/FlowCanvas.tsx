@@ -12,30 +12,38 @@ import ReactFlow, {
 } from "reactflow";
 
 import CustomNode from "./CustomNode";
+import type { MyNodeData } from "./CustomNode";
 import DockWrapper from "./dock/DockWrapper";
 import SimpleDock from "./dock/SimpleDock";
 import useCanvasStore from "@/stores/useCanvasStore";
 import NodeCreateDialog from "./NodeCreateDialog";
 
-type MyNodeData = { label?: string; onClick?: (id: string) => void };
-
-const initialNodes = [
+const initialNodes: { id: string; type: string; position: { x: number; y: number }; data: MyNodeData }[] = [
   {
     id: "1",
     type: "custom",
-    position: { x: 50, y: 50 },
+    position: { x: 80, y: 60 },
     data: {
-      label: "Click me",
-      onClick: (id: string) => alert(`Clicked ${id}`),
+      label: "Getting Started",
+      body: "Learn the **basics** of the platform before moving on to advanced topics.",
     },
   },
   {
     id: "2",
     type: "custom",
-    position: { x: 50, y: 200 },
+    position: { x: 80, y: 220 },
     data: {
-      label: "Or me",
-      onClick: (id: string) => console.log("clicked", id),
+      label: "Core Concepts",
+      body: ["Nodes & Edges", "State management", "Custom renderers"],
+    },
+  },
+  {
+    id: "3",
+    type: "custom",
+    position: { x: 80, y: 380 },
+    data: {
+      label: "Next Steps",
+      // body intentionally omitted — heading-only node
     },
   },
 ];
@@ -52,8 +60,6 @@ const initialEdges = [
 const nodeTypes = { custom: CustomNode };
 
 export default function FlowCanvas() {
-  // guard: React Flow must only render in the browser
-  if (typeof window === "undefined") return null;
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
   const setNodes = useCanvasStore((s) => s.setNodes);
@@ -116,6 +122,9 @@ export default function FlowCanvas() {
           fitView
           onNodeClick={(e, node) => {
             setSelectedNodeId(node.id);
+          }}
+          onPaneClick={() => {
+            setSelectedNodeId(null);
           }}
         >
           <Background />
